@@ -90,13 +90,24 @@ export default function PostPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+      <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <Link href="/" className="text-xhs-red hover:underline text-sm">
             ← 返回首页
           </Link>
         </div>
       </header>
+
+      {/* Fixed Navigation */}
+      <nav className="sticky top-[61px] z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center gap-1 py-2">
+            <a href="#content" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">📄 笔记正文</a>
+            <a href="#tags" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">🏷️ 笔记标签</a>
+            <a href="#prompts" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">🖼️ 配图提示词</a>
+          </div>
+        </div>
+      </nav>
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
@@ -116,7 +127,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 2: 笔记正文 */}
-        <article className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+        <article id="content" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">📄 笔记正文</h2>
             <button
@@ -139,7 +150,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 3: 笔记标签 */}
-        <article className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+        <article id="tags" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">🏷️ 笔记标签</h2>
             <button
@@ -172,7 +183,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 4: 配图提示词 */}
-        <article className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+        <article id="prompts" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">🖼️ 配图提示词</h2>
             <button
