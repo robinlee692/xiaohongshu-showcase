@@ -16,7 +16,21 @@ function contentDirExists(): boolean {
   }
 }
 
-// Extract image suggestions and prompts from content
+// Load image prompts from .prompts.json file
+function loadImagePrompts(slug: string): string[] {
+  try {
+    const promptsPath = path.join(xiaohongshuDirectory, `${slug}.prompts.json`)
+    if (fs.existsSync(promptsPath)) {
+      const data = JSON.parse(fs.readFileSync(promptsPath, 'utf8'))
+      return data.imagePrompts || []
+    }
+  } catch (error) {
+    console.error(`Failed to load prompts for ${slug}:`, error)
+  }
+  return []
+}
+
+// Extract image suggestions and prompts from content (fallback for old format)
 function extractImageInfo(content: string): { imageSuggestions?: string[]; imagePrompts?: string[] } {
   const result: { imageSuggestions?: string[]; imagePrompts?: string[] } = {}
   
@@ -62,18 +76,22 @@ export function getSortedPostsData() {
 
       // Use gray-matter to parse the post metadata section
       const matterResult = matter(fileContents)
+      const slug = fileName.replace(/\.md$/, '')
       
-      // Extract image info from content
-      const imageInfo = extractImageInfo(matterResult.content)
+      // Load image prompts from .prompts.json file (v3.0 format)
+      const imagePrompts = loadImagePrompts(slug)
+      
+      // Fallback to extracting from content (old format)
+      const imageInfo = imagePrompts.length === 0 ? extractImageInfo(matterResult.content) : { imagePrompts }
 
       return {
-        slug: fileName.replace(/\.md$/, ''),
+        slug,
         title: matterResult.data.title || '无标题',
         date: matterResult.data.date || fileName.split('-').slice(0, 3).join('-'),
         content: matterResult.content,
         tags: matterResult.data.tags || [],
         status: matterResult.data.status || '待发布',
-        imageCount: imageInfo.imageSuggestions?.length || 0,
+        imageCount: imageInfo.imagePrompts?.length || 0,
         hasImagePrompts: !!imageInfo.imagePrompts?.length,
       }
     })
@@ -117,8 +135,14 @@ export async function getPostData(slug: string) {
   // Use gray-matter to parse the post metadata section
   const matterResult = matter(fileContents)
   
-  // Extract image info from content
-  const imageInfo = extractImageInfo(matterResult.content)
+  // Load image prompts from .prompts.json file (v3.0 format)
+  let imagePrompts = loadImagePrompts(slug)
+  
+  // Fallback to extracting from content (old format)
+  if (imagePrompts.length === 0) {
+    const imageInfo = extractImageInfo(matterResult.content)
+    imagePrompts = imageInfo.imagePrompts || []
+  }
 
   // Use remark to convert markdown into HTML string
   const processedContent = await remark()
@@ -131,7 +155,6 @@ export async function getPostData(slug: string) {
     contentHtml,
     content: matterResult.content,
     ...(matterResult.data as { date: string; title: string; tags?: string[]; status?: string }),
-    imageSuggestions: imageInfo.imageSuggestions || [],
-    imagePrompts: imageInfo.imagePrompts || [],
+    imagePrompts,
   }
 }
