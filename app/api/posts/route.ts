@@ -3,6 +3,7 @@ import { getSortedPostsData } from '@/lib/posts'
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import { execSync } from 'child_process'
 
 const contentDirectory = path.join(process.cwd(), 'content')
 
@@ -28,9 +29,33 @@ export async function DELETE(request: NextRequest) {
     
     for (const slug of slugs) {
       const filePath = path.join(contentDirectory, `${slug}.md`)
+      const promptsPath = path.join(contentDirectory, `${slug}.prompts.json`)
+      
+      // Delete .md file
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
         deletedSlugs.push(slug)
+        console.log(`Deleted: ${filePath}`)
+      }
+      
+      // Delete .prompts.json file if exists
+      if (fs.existsSync(promptsPath)) {
+        fs.unlinkSync(promptsPath)
+        console.log(`Deleted: ${promptsPath}`)
+      }
+    }
+
+    // Commit and push changes to Git
+    if (deletedSlugs.length > 0) {
+      try {
+        execSync('git config user.name "OpenClaw Bot"')
+        execSync('git config user.email "bot@openclaw.ai"')
+        execSync(`git add -A && git commit -m "chore: delete ${deletedSlugs.length} posts" || echo "No changes to commit"`)
+        execSync('git push origin main')
+        console.log('Git push successful')
+      } catch (gitError) {
+        console.error('Git operation failed:', gitError)
+        // Continue even if git fails - files are still deleted locally
       }
     }
 
