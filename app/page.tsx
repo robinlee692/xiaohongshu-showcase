@@ -200,21 +200,19 @@ export default function Home() {
                 <Link href={`/posts/${post.slug}`}>
                   <div className="xhs-card h-full cursor-pointer pt-8">
                     <div className="p-4">
-                      <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
-                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium cursor-pointer hover:opacity-80 transition ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`} onClick={(e) => { e.stopPropagation(); handleStatusChange(post.slug, post.status === '待发布' ? '已发布' : '待发布') }} title="点击切换状态">{post.status || '待发布'}</span>
+                      <h2 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{post.title}</h2>
+                      <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{formatDate(post.date)}</span>
-                      </div>
-                      <h2 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">{post.title}</h2>
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {post.tags.slice(0, 3).map((tag, index) => (
-                            <span key={index} className="px-1.5 py-0.5 bg-xhs-pink bg-opacity-20 text-xhs-red text-[10px] rounded-full">#{tag}</span>
-                          ))}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-gray-100">
-                        <span>📄 {post.content.length}字</span>
-                        <span>🖼️ {post.imageCount || 0}图</span>
+                        {post.tags && post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {post.tags.slice(0, 2).map((tag, index) => (
+                              <span key={index} className="px-1.5 py-0.5 bg-xhs-pink bg-opacity-20 text-xhs-red text-[10px] rounded-full">#{tag}</span>
+                            ))}
+                            {post.tags.length > 2 && (
+                              <span className="text-[10px] text-gray-500">+{post.tags.length - 2}</span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -228,24 +226,18 @@ export default function Home() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="w-10 px-4 py-3"></th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">状态</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">标题</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">日期</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">标签</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">字数</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3">配图</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {posts.map((post) => (
                   <tr key={post.slug} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/posts/${post.slug}`}>
                     <td className="px-4 py-3"><input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={(e) => { e.stopPropagation(); toggleSelect(post.slug) }} className={`w-4 h-4 text-red-600 rounded transition-opacity ${selectedPosts.size > 0 ? 'opacity-100' : 'opacity-0 hover:opacity-50'}`} /></td>
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}><span className={`px-2 py-1 text-xs rounded-full font-medium cursor-pointer hover:opacity-80 transition ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`} onClick={(e) => { e.stopPropagation(); handleStatusChange(post.slug, post.status === '待发布' ? '已发布' : '待发布') }} title="点击切换状态">{post.status || '待发布'}</span></td>
                     <td className="px-4 py-3"><span className="text-sm font-medium text-gray-800">{post.title}</span></td>
                     <td className="px-4 py-3"><span className="text-sm text-gray-500">{formatDate(post.date)}</span></td>
                     <td className="px-4 py-3"><div className="flex flex-wrap gap-1">{post.tags?.slice(0, 3).map((tag, index) => (<span key={index} className="px-2 py-0.5 bg-xhs-pink bg-opacity-20 text-xhs-red text-xs rounded-full">#{tag}</span>))}{post.tags && post.tags.length > 3 && (<span className="text-xs text-gray-500">+{post.tags.length - 3}</span>)}</div></td>
-                    <td className="px-4 py-3"><span className="text-sm text-gray-500">{post.content.length}字</span></td>
-                    <td className="px-4 py-3"><span className="text-sm text-gray-500">{post.imageCount || 0}图</span></td>
                   </tr>
                 ))}
               </tbody>
