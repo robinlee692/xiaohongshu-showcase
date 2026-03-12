@@ -159,22 +159,32 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-xhs-red">📕 小红书内容展示</h1>
-              <p className="text-sm text-gray-600 mt-0.5">共 {posts.length} 篇 | 已选择 {selectedPosts.size} 篇</p>
+              <p className="text-sm text-gray-600 mt-0.5">共 {posts.length} 篇</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button onClick={() => setViewMode('grid')} className={`px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'grid' ? 'bg-white text-xhs-red shadow-sm' : 'text-gray-600'}`}>卡片</button>
                 <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'list' ? 'bg-white text-xhs-red shadow-sm' : 'text-gray-600'}`}>列表</button>
               </div>
-              {selectedPosts.size > 0 && (
-                <button onClick={() => setShowDeleteConfirm(true)} className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600">删除选中 ({selectedPosts.size})</button>
-              )}
               <button onClick={() => { sessionStorage.removeItem('authenticated'); setIsAuthenticated(false) }} className="text-gray-500 hover:text-gray-700 text-sm">退出</button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <input type="checkbox" id="selectAll" checked={selectedPosts.size === posts.length && posts.length > 0} onChange={toggleSelectAll} className="w-4 h-4 text-xhs-red rounded" />
-            <label htmlFor="selectAll" className="text-sm text-gray-600 cursor-pointer">全选 / 取消全选</label>
+          
+          {/* 批量操作栏 - 仅在选择内容时显示 */}
+          {selectedPosts.size > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <input type="checkbox" checked={true} readOnly className="w-4 h-4 text-red-600 rounded" />
+                <span className="text-sm font-medium text-red-700">已选择 {selectedPosts.size} 篇</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setSelectedPosts(new Set())} className="text-sm text-red-600 hover:text-red-800 font-medium">取消选择</button>
+                <button onClick={() => setShowDeleteConfirm(true)} className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600">删除选中</button>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span>💡 提示：勾选内容后可批量删除，点击状态标签可切换状态</span>
           </div>
         </div>
       </header>
@@ -186,7 +196,7 @@ export default function Home() {
           <div className="grid grid-cols-5 gap-4">
             {posts.map((post) => (
               <div key={post.slug} className="relative">
-                <input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={() => toggleSelect(post.slug)} className="absolute top-2 left-2 w-4 h-4 text-xhs-red rounded z-10" />
+                <input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={() => toggleSelect(post.slug)} className={`absolute top-3 left-3 w-4 h-4 text-red-600 rounded z-10 transition-opacity ${selectedPosts.size > 0 ? 'opacity-100' : 'opacity-0 hover:opacity-50'}`} />
                 <Link href={`/posts/${post.slug}`}>
                   <div className="xhs-card h-full cursor-pointer pt-8">
                     <div className="p-4">
@@ -229,7 +239,7 @@ export default function Home() {
               <tbody className="divide-y divide-gray-200">
                 {posts.map((post) => (
                   <tr key={post.slug} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/posts/${post.slug}`}>
-                    <td className="px-4 py-3"><input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={(e) => { e.stopPropagation(); toggleSelect(post.slug) }} className="w-4 h-4 text-xhs-red rounded" /></td>
+                    <td className="px-4 py-3"><input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={(e) => { e.stopPropagation(); toggleSelect(post.slug) }} className={`w-4 h-4 text-red-600 rounded transition-opacity ${selectedPosts.size > 0 ? 'opacity-100' : 'opacity-0 hover:opacity-50'}`} /></td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}><span className={`px-2 py-1 text-xs rounded-full font-medium cursor-pointer hover:opacity-80 transition ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`} onClick={(e) => { e.stopPropagation(); handleStatusChange(post.slug, post.status === '待发布' ? '已发布' : '待发布') }} title="点击切换状态">{post.status || '待发布'}</span></td>
                     <td className="px-4 py-3"><span className="text-sm font-medium text-gray-800">{post.title}</span></td>
                     <td className="px-4 py-3"><span className="text-sm text-gray-500">{formatDate(post.date)}</span></td>
