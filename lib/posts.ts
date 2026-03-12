@@ -22,14 +22,22 @@ function extractImageInfo(content: string): { imageSuggestions?: string[]; image
   
   // Extract image suggestions (【图 X - 标题】格式)
   const imagePattern = /【(图 \d+[^】]*)】/g
-  const imageMatches = [...content.matchAll(imagePattern)]
+  let imageMatch
+  const imageMatches: RegExpExecArray[] = []
+  while ((imageMatch = imagePattern.exec(content)) !== null) {
+    imageMatches.push(imageMatch)
+  }
   if (imageMatches.length > 0) {
     result.imageSuggestions = imageMatches.map(m => m[1])
   }
   
   // Extract image prompts (画面：开头的段落)
   const promptPattern = /画面：([^\n]+)/g
-  const promptMatches = [...content.matchAll(promptPattern)]
+  let promptMatch
+  const promptMatches: RegExpExecArray[] = []
+  while ((promptMatch = promptPattern.exec(content)) !== null) {
+    promptMatches.push(promptMatch)
+  }
   if (promptMatches.length > 0) {
     result.imagePrompts = promptMatches.map(m => m[1].trim())
   }
