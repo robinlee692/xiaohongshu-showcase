@@ -174,7 +174,7 @@ export default function Home() {
         {posts.length === 0 ? (
           <div className="text-center py-20"><div className="text-6xl mb-4">📝</div><h2 className="text-xl font-bold text-gray-700 mb-2">暂无内容</h2><p className="text-gray-500 text-sm">小红书内容正在生成中...</p></div>
         ) : viewMode === 'grid' ? (
-          /* 卡片视图 - 响应式布局 */}
+          {/* 卡片视图 - 响应式布局 */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {posts.map((post) => (
               <div key={post.slug} className="relative">
