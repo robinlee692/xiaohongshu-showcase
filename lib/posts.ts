@@ -16,6 +16,27 @@ function contentDirExists(): boolean {
   }
 }
 
+// Extract image suggestions and prompts from content
+function extractImageInfo(content: string): { imageSuggestions?: string[]; imagePrompts?: string[] } {
+  const result: { imageSuggestions?: string[]; imagePrompts?: string[] } = {}
+  
+  // Extract image suggestions (【图 X - 标题】格式)
+  const imagePattern = /【(图 \d+[^】]*)】/g
+  const imageMatches = [...content.matchAll(imagePattern)]
+  if (imageMatches.length > 0) {
+    result.imageSuggestions = imageMatches.map(m => m[1])
+  }
+  
+  // Extract image prompts (画面：开头的段落)
+  const promptPattern = /画面：([^\n]+)/g
+  const promptMatches = [...content.matchAll(promptPattern)]
+  if (promptMatches.length > 0) {
+    result.imagePrompts = promptMatches.map(m => m[1].trim())
+  }
+  
+  return result
+}
+
 export function getSortedPostsData() {
   // Return empty array if content directory doesn't exist
   if (!contentDirExists()) {
@@ -33,6 +54,9 @@ export function getSortedPostsData() {
 
       // Use gray-matter to parse the post metadata section
       const matterResult = matter(fileContents)
+      
+      // Extract image info from content
+      const imageInfo = extractImageInfo(matterResult.content)
 
       return {
         slug: fileName.replace(/\.md$/, ''),
@@ -41,6 +65,8 @@ export function getSortedPostsData() {
         content: matterResult.content,
         tags: matterResult.data.tags || [],
         status: matterResult.data.status || '待发布',
+        imageCount: imageInfo.imageSuggestions?.length || 0,
+        hasImagePrompts: !!imageInfo.imagePrompts?.length,
       }
     })
   
@@ -82,6 +108,9 @@ export async function getPostData(slug: string) {
 
   // Use gray-matter to parse the post metadata section
   const matterResult = matter(fileContents)
+  
+  // Extract image info from content
+  const imageInfo = extractImageInfo(matterResult.content)
 
   // Use remark to convert markdown into HTML string
   const processedContent = await remark()
@@ -92,6 +121,9 @@ export async function getPostData(slug: string) {
   return {
     slug,
     contentHtml,
+    content: matterResult.content,
     ...(matterResult.data as { date: string; title: string; tags?: string[]; status?: string }),
+    imageSuggestions: imageInfo.imageSuggestions || [],
+    imagePrompts: imageInfo.imagePrompts || [],
   }
 }

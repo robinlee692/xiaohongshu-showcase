@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --xhs-red: #ff2442;
+  --xhs-pink: #ffb6c2;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
@@ -19,10 +21,83 @@ body {
   min-height: 100vh;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff2442;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e01e3a;
+}
+
 .xhs-card {
   @apply bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
 }
 
 .xhs-btn {
   @apply bg-xhs-red text-white px-6 py-2 rounded-full font-medium transition-all duration-200 hover:bg-red-600 active:scale-95;
+}
+
+/* Prose customization for markdown content */
+.prose {
+  @apply text-gray-700 leading-relaxed;
+}
+
+.prose h1 {
+  @apply text-2xl font-bold text-gray-800 mt-6 mb-4;
+}
+
+.prose h2 {
+  @apply text-xl font-bold text-gray-800 mt-5 mb-3;
+}
+
+.prose h3 {
+  @apply text-lg font-bold text-gray-800 mt-4 mb-2;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose ul, .prose ol {
+  @apply mb-4 pl-6;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose strong {
+  @apply font-bold text-gray-800;
+}
+
+.prose a {
+  @apply text-xhs-red hover:underline;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-xhs-red pl-4 italic text-gray-600 my-4;
+}
+
+.prose code {
+  @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono;
+}
+
+.prose pre {
+  @apply bg-gray-800 text-white p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.prose pre code {
+  @apply bg-transparent text-white p-0;
 }
