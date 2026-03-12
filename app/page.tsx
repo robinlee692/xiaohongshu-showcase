@@ -74,20 +74,31 @@ export default function Home() {
     }
   }
 
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
   const handleDelete = async () => {
+    setDeleting(true)
+    setDeleteError('')
     try {
       const res = await fetch('/api/posts', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slugs: Array.from(selectedPosts) })
       })
-      if (res.ok) {
+      const data = await res.json()
+      if (res.ok && data.success) {
         setPosts(posts.filter(p => !selectedPosts.has(p.slug)))
         setSelectedPosts(new Set())
         setShowDeleteConfirm(false)
+      } else {
+        setDeleteError(data.error || '删除失败，请重试')
       }
     } catch (err) {
       console.error('Delete failed:', err)
+      setDeleteError('网络错误，请重试')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -179,8 +190,8 @@ export default function Home() {
                 <Link href={`/posts/${post.slug}`}>
                   <div className="xhs-card h-full cursor-pointer pt-8">
                     <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <select value={post.status || '待发布'} onChange={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusChange(post.slug, e.target.value) }} onClick={(e) => e.stopPropagation()} className={`px-2 py-0.5 text-xs rounded-full font-medium border-0 cursor-pointer ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}><option value="待发布">待发布</option><option value="已发布">已发布</option></select>
+                      <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
+                        <select value={post.status || '待发布'} onChange={(e) => { e.stopPropagation(); handleStatusChange(post.slug, e.target.value) }} onClick={(e) => e.stopPropagation()} className={`px-2 py-0.5 text-xs rounded-full font-medium border-0 cursor-pointer ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}><option value="待发布">待发布</option><option value="已发布">已发布</option></select>
                         <span className="text-xs text-gray-500">{formatDate(post.date)}</span>
                       </div>
                       <h2 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">{post.title}</h2>
@@ -219,7 +230,7 @@ export default function Home() {
                 {posts.map((post) => (
                   <tr key={post.slug} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/posts/${post.slug}`}>
                     <td className="px-4 py-3"><input type="checkbox" checked={selectedPosts.has(post.slug)} onChange={(e) => { e.stopPropagation(); toggleSelect(post.slug) }} className="w-4 h-4 text-xhs-red rounded" /></td>
-                    <td className="px-4 py-3"><select value={post.status || '待发布'} onChange={(e) => { e.stopPropagation(); handleStatusChange(post.slug, e.target.value) }} className={`px-2 py-1 text-xs rounded-full font-medium border-0 cursor-pointer ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}><option value="待发布">待发布</option><option value="已发布">已发布</option></select></td>
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}><select value={post.status || '待发布'} onChange={(e) => { e.stopPropagation(); handleStatusChange(post.slug, e.target.value) }} onClick={(e) => e.stopPropagation()} className={`px-2 py-1 text-xs rounded-full font-medium border-0 cursor-pointer ${post.status === '已发布' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}><option value="待发布">待发布</option><option value="已发布">已发布</option></select></td>
                     <td className="px-4 py-3"><span className="text-sm font-medium text-gray-800">{post.title}</span></td>
                     <td className="px-4 py-3"><span className="text-sm text-gray-500">{formatDate(post.date)}</span></td>
                     <td className="px-4 py-3"><div className="flex flex-wrap gap-1">{post.tags?.slice(0, 3).map((tag, index) => (<span key={index} className="px-2 py-0.5 bg-xhs-pink bg-opacity-20 text-xhs-red text-xs rounded-full">#{tag}</span>))}{post.tags && post.tags.length > 3 && (<span className="text-xs text-gray-500">+{post.tags.length - 3}</span>)}</div></td>
@@ -241,10 +252,11 @@ export default function Home() {
               <h3 className="text-xl font-bold text-gray-800 mb-2">确认删除</h3>
               <p className="text-gray-600">确定要删除选中的 <span className="font-bold text-xhs-red">{selectedPosts.size}</span> 篇内容吗？</p>
               <p className="text-sm text-gray-500 mt-2">此操作不可恢复！</p>
+              {deleteError && <p className="text-red-500 text-sm mt-3">{deleteError}</p>}
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50">取消</button>
-              <button onClick={handleDelete} className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600">确认删除</button>
+              <button onClick={() => { setShowDeleteConfirm(false); setDeleteError('') }} disabled={deleting} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50">取消</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 disabled:opacity-50">{deleting ? '删除中...' : '确认删除'}</button>
             </div>
           </div>
         </div>
