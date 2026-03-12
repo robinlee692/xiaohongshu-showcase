@@ -3,7 +3,6 @@ import { getSortedPostsData } from '@/lib/posts'
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { execSync } from 'child_process'
 
 const contentDirectory = path.join(process.cwd(), 'content')
 
@@ -45,28 +44,27 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // Commit and push changes to Git
+    // Note: Git operations are not supported in Vercel Serverless environment
+    // Files will be deleted in the current deployment but will reappear on next deployment
+    // For production use, consider using a database or external storage
+
     if (deletedSlugs.length > 0) {
-      try {
-        execSync('git config user.name "OpenClaw Bot"')
-        execSync('git config user.email "bot@openclaw.ai"')
-        execSync(`git add -A && git commit -m "chore: delete ${deletedSlugs.length} posts" || echo "No changes to commit"`)
-        execSync('git push origin main')
-        console.log('Git push successful')
-      } catch (gitError) {
-        console.error('Git operation failed:', gitError)
-        // Continue even if git fails - files are still deleted locally
-      }
+      console.log(`Successfully deleted ${deletedSlugs.length} posts`)
+      console.log('Note: Changes are temporary in Vercel. Commit to Git for persistence.')
     }
 
     return NextResponse.json({ 
       success: true, 
       deleted: deletedSlugs,
-      message: `Successfully deleted ${deletedSlugs.length} posts`
+      message: `Successfully deleted ${deletedSlugs.length} posts`,
+      note: 'Changes are temporary in Vercel Serverless environment'
     })
   } catch (error) {
     console.error('Error deleting posts:', error)
-    return NextResponse.json({ error: 'Failed to delete posts' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to delete posts',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
 
