@@ -4,12 +4,25 @@ import matter from 'gray-matter'
 import { remark } from 'remark'
 import html from 'remark-html'
 
-const xiaohongshuDirectory = path.join(
-  process.env.XIAOHONGSHU_CONTENT_PATH || '/home/robin/.openclaw/workspace/xiaohongshu',
-)
+// Use relative path within project directory (for Vercel deployment)
+const xiaohongshuDirectory = path.join(process.cwd(), 'content')
+
+// Check if directory exists
+function contentDirExists(): boolean {
+  try {
+    return fs.existsSync(xiaohongshuDirectory)
+  } catch {
+    return false
+  }
+}
 
 export function getSortedPostsData() {
-  // Get file names under /xiaohongshu
+  // Return empty array if content directory doesn't exist
+  if (!contentDirExists()) {
+    return []
+  }
+
+  // Get file names under /content
   const fileNames = fs.readdirSync(xiaohongshuDirectory)
   const allPostsData = fileNames
     .filter(fileName => fileName.endsWith('.md'))
@@ -42,6 +55,10 @@ export function getSortedPostsData() {
 }
 
 export function getAllPostSlugs() {
+  if (!contentDirExists()) {
+    return []
+  }
+  
   const fileNames = fs.readdirSync(xiaohongshuDirectory)
   return fileNames
     .filter(fileName => fileName.endsWith('.md'))
@@ -51,7 +68,16 @@ export function getAllPostSlugs() {
 }
 
 export async function getPostData(slug: string) {
+  if (!contentDirExists()) {
+    throw new Error('Content directory not found')
+  }
+  
   const fullPath = path.join(xiaohongshuDirectory, `${slug}.md`)
+  
+  if (!fs.existsSync(fullPath)) {
+    throw new Error(`Post not found: ${slug}`)
+  }
+  
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
   // Use gray-matter to parse the post metadata section
