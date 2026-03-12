@@ -58,6 +58,22 @@ export default function PostPage() {
     }
   }
 
+  // Smooth scroll handler
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault()
+    const element = document.getElementById(targetId)
+    if (element) {
+      const headerOffset = 100
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+  }
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
@@ -91,26 +107,16 @@ export default function PostPage() {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-[1200px] mx-auto px-4 py-4">
           <Link href="/" className="text-xhs-red hover:underline text-sm">
             ← 返回首页
           </Link>
         </div>
       </header>
 
-      {/* Fixed Navigation */}
-      <nav className="sticky top-[61px] z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center gap-1 py-2">
-            <a href="#content" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">📄 笔记正文</a>
-            <a href="#tags" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">🏷️ 笔记标签</a>
-            <a href="#prompts" className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-xhs-red hover:text-white rounded-lg transition text-center">🖼️ 配图提示词</a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-[1200px] mx-auto px-4 py-8 flex gap-8">
+        {/* Main Content */}
+        <main className="flex-1">
         {/* Section 1: 笔记标题 */}
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-xhs-red to-pink-500 p-6 text-white">
@@ -127,7 +133,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 2: 笔记正文 */}
-        <article id="content" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
+        <article id="content" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-smooth">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">📄 笔记正文</h2>
             <button
@@ -150,7 +156,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 3: 笔记标签 */}
-        <article id="tags" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
+        <article id="tags" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-smooth">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">🏷️ 笔记标签</h2>
             <button
@@ -183,7 +189,7 @@ export default function PostPage() {
         </article>
 
         {/* Section 4: 配图提示词 */}
-        <article id="prompts" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-mt-40">
+        <article id="prompts" className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 scroll-smooth">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">🖼️ 配图提示词</h2>
             <button
@@ -236,7 +242,32 @@ export default function PostPage() {
             返回首页
           </Link>
         </div>
-      </main>
+        </main>
+
+        {/* Right Sidebar Navigation - Timeline Style */}
+        <aside className="hidden lg:block w-48 shrink-0">
+          <nav className="sticky top-24 space-y-0">
+            <div className="text-xs font-medium text-gray-500 mb-4 pl-4">目录导航</div>
+            <div className="relative border-l-2 border-gray-200 ml-4 space-y-0">
+              <a href="#content" onClick={(e) => handleSmoothScroll(e, 'content')} className="block relative pl-6 pb-6 group">
+                <span className="absolute -left-[9px] top-0 w-4 h-4 bg-xhs-red rounded-full border-4 border-white shadow-sm group-hover:scale-125 transition-transform"></span>
+                <div className="text-sm font-medium text-gray-800 group-hover:text-xhs-red transition-colors">📄 笔记正文</div>
+                <div className="text-xs text-gray-500 mt-1">点击快速跳转</div>
+              </a>
+              <a href="#tags" onClick={(e) => handleSmoothScroll(e, 'tags')} className="block relative pl-6 pb-6 group">
+                <span className="absolute -left-[9px] top-0 w-4 h-4 bg-xhs-red rounded-full border-4 border-white shadow-sm group-hover:scale-125 transition-transform"></span>
+                <div className="text-sm font-medium text-gray-800 group-hover:text-xhs-red transition-colors">🏷️ 笔记标签</div>
+                <div className="text-xs text-gray-500 mt-1">点击快速跳转</div>
+              </a>
+              <a href="#prompts" onClick={(e) => handleSmoothScroll(e, 'prompts')} className="block relative pl-6 group">
+                <span className="absolute -left-[9px] top-0 w-4 h-4 bg-xhs-red rounded-full border-4 border-white shadow-sm group-hover:scale-125 transition-transform"></span>
+                <div className="text-sm font-medium text-gray-800 group-hover:text-xhs-red transition-colors">🖼️ 配图提示词</div>
+                <div className="text-xs text-gray-500 mt-1">点击快速跳转</div>
+              </a>
+            </div>
+          </nav>
+        </aside>
+      </div>
 
       {/* Footer */}
       <footer className="bg-white mt-12 py-6">
