@@ -10,6 +10,19 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* 移动端优化 */
+@supports (-webkit-touch-callout: none) {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@supports not (-webkit-touch-callout: none) {
+  .safe-area-pb {
+    padding-bottom: 0;
+  }
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -19,6 +32,23 @@ body {
     )
     rgb(var(--background-start-rgb));
   min-height: 100vh;
+  /* 移动端触摸优化 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 禁止长按选中（移动端） */
+@media (max-width: 768px) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* 允许在可编辑区域选中 */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
 }
 
 /* Custom scrollbar */

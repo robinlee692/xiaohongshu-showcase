@@ -105,18 +105,18 @@ export default function PostPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50">
-      {/* Header */}
+      {/* Header - 移动端优化 */}
       <header className="bg-white shadow-sm sticky top-0 z-20">
-        <div className="max-w-[1200px] mx-auto px-4 py-4">
-          <Link href="/" className="text-xhs-red hover:underline text-sm">
+        <div className="max-w-[1200px] mx-auto px-4 py-3">
+          <Link href="/" className="text-xhs-red hover:underline text-sm font-medium">
             ← 返回首页
           </Link>
         </div>
       </header>
 
-      <div className="max-w-[1200px] mx-auto px-4 py-8 flex gap-8">
-        {/* Main Content */}
-        <main className="flex-1">
+      <div className="max-w-[1200px] mx-auto px-4 py-4 flex gap-6">
+        {/* Main Content - 移动端优化 */}
+        <main className="flex-1 min-w-0">
         {/* Section 1: 笔记标题 */}
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-xhs-red to-pink-500 p-6 text-white">
@@ -244,8 +244,8 @@ export default function PostPage() {
         </div>
         </main>
 
-        {/* Right Sidebar Navigation - Timeline Style */}
-        <aside className="hidden lg:block w-48 shrink-0">
+        {/* Right Sidebar Navigation - Timeline Style (移动端隐藏) */}
+        <aside className="hidden xl:block w-48 shrink-0">
           <nav className="sticky top-24 space-y-0">
             <div className="text-xs font-medium text-gray-500 mb-4 pl-4">目录导航</div>
             <div className="relative border-l-2 border-gray-200 ml-4 space-y-0">
@@ -268,6 +268,24 @@ export default function PostPage() {
           </nav>
         </aside>
       </div>
+
+      {/* 移动端底部导航 */}
+      <nav className="xl:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 safe-area-pb">
+        <div className="flex items-center justify-around py-2">
+          <a href="#content" onClick={(e) => handleSmoothScroll(e, 'content')} className="flex flex-col items-center p-2 text-xs text-gray-700 hover:text-xhs-red">
+            <span className="text-lg">📄</span>
+            <span>正文</span>
+          </a>
+          <a href="#tags" onClick={(e) => handleSmoothScroll(e, 'tags')} className="flex flex-col items-center p-2 text-xs text-gray-700 hover:text-xhs-red">
+            <span className="text-lg">🏷️</span>
+            <span>标签</span>
+          </a>
+          <a href="#prompts" onClick={(e) => handleSmoothScroll(e, 'prompts')} className="flex flex-col items-center p-2 text-xs text-gray-700 hover:text-xhs-red">
+            <span className="text-lg">🖼️</span>
+            <span>提示词</span>
+          </a>
+        </div>
+      </nav>
 
       {/* Footer */}
       <footer className="bg-white mt-12 py-6">
